@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center justify-between py-4">
         <Input
-          placeholder="Filter by description..."
+          placeholder="Filtrar por descripción..."
           value={(table.getColumn('description')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
             table.getColumn('description')?.setFilterValue(event.target.value)
@@ -81,12 +81,12 @@ export function DataTable<TData, TValue>({
             <DialogTrigger asChild>
                 <Button>
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Add {transactionType === 'income' ? 'Income' : 'Expense'}
+                    Añadir {transactionType === 'income' ? 'Ingreso' : 'Egreso'}
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Add New {transactionType === 'income' ? 'Income' : 'Expense'}</DialogTitle>
+                    <DialogTitle>Añadir Nuevo {transactionType === 'income' ? 'Ingreso' : 'Egreso'}</DialogTitle>
                 </DialogHeader>
                 <TransactionForm type={transactionType} onSubmit={(values) => {
                     onAdd(values);
@@ -138,7 +138,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No hay resultados.
                 </TableCell>
               </TableRow>
             )}
@@ -152,7 +152,7 @@ export function DataTable<TData, TValue>({
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
-          Previous
+          Anterior
         </Button>
         <Button
           variant="outline"
@@ -160,7 +160,7 @@ export function DataTable<TData, TValue>({
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
-          Next
+          Siguiente
         </Button>
       </div>
     </div>

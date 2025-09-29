@@ -28,7 +28,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold font-headline">Dashboard</h1>
+      <h1 className="text-3xl font-bold font-headline">Panel</h1>
       
       <SummaryCards
         totalIncome={totalIncome}
@@ -39,7 +39,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Expense Categories</CardTitle>
+            <CardTitle>Categorías de Gastos</CardTitle>
           </CardHeader>
           <CardContent>
             <CategoryChart transactions={monthlyTransactions.filter(t => t.type === 'expense')} />
@@ -48,7 +48,7 @@ export default function DashboardPage() {
         
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Recent Transactions</CardTitle>
+            <CardTitle>Transacciones Recientes</CardTitle>
           </CardHeader>
           <CardContent>
             <RecentTransactions transactions={recentTransactions} />

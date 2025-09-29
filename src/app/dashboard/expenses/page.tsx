@@ -30,7 +30,7 @@ export default function ExpensesPage() {
   
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold font-headline">Expenses</h1>
+      <h1 className="text-3xl font-bold font-headline">Egresos</h1>
       <DataTable
         columns={columns({ onUpdate: handleUpdateTransaction, onDelete: handleDeleteTransaction, transactionType: 'expense' })}
         data={transactions}

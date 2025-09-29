@@ -39,10 +39,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Logo from '@/components/logo';
 
 const navItems = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/dashboard/income', icon: ArrowUpRight, label: 'Income' },
-  { href: '/dashboard/expenses', icon: ArrowDownLeft, label: 'Expenses' },
-  { href: '/dashboard/analysis', icon: Sparkles, label: 'AI Analysis' },
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Panel' },
+  { href: '/dashboard/income', icon: ArrowUpRight, label: 'Ingresos' },
+  { href: '/dashboard/expenses', icon: ArrowDownLeft, label: 'Egresos' },
+  { href: '/dashboard/analysis', icon: Sparkles, label: 'Análisis IA' },
 ];
 
 export default function DashboardLayout({
@@ -112,16 +112,16 @@ export default function DashboardLayout({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="right" align="start" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem disabled>
                 <UserIcon className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+                <span>Perfil</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span>Cerrar Sesión</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

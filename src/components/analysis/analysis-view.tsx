@@ -20,16 +20,16 @@ export function AnalysisView({ result, onReset }: AnalysisViewProps) {
   return (
     <div className="space-y-6 animate-in fade-in-50">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold font-headline">Analysis Results</h2>
+        <h2 className="text-2xl font-semibold font-headline">Resultados del Análisis</h2>
         <Button variant="outline" onClick={onReset}>
             <RotateCcw className="mr-2 h-4 w-4" />
-            Run New Analysis
+            Ejecutar Nuevo Análisis
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Transaction Summary</CardTitle>
+          <CardTitle>Resumen de Transacciones</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">{result.summary}</p>
@@ -38,8 +38,8 @@ export function AnalysisView({ result, onReset }: AnalysisViewProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Categorized Insights</CardTitle>
-          <CardDescription>Here's how your spending breaks down across different categories.</CardDescription>
+          <CardTitle>Información por Categoría</CardTitle>
+          <CardDescription>Así es como se desglosan tus gastos en diferentes categorías.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {result.categorizedInsights.map((category) => (
@@ -65,7 +65,7 @@ export function AnalysisView({ result, onReset }: AnalysisViewProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-accent-foreground">
             <Lightbulb className="text-accent" />
-            Suggestions for Improvement
+            Sugerencias de Mejora
           </CardTitle>
         </CardHeader>
         <CardContent>

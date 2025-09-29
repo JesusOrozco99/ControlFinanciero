@@ -23,11 +23,11 @@ export default function AnalysisPage() {
       const result = await runAnalysis();
       setAnalysisResult(result);
     } catch (e: any) {
-      setError(e.message || 'An unexpected error occurred.');
+      setError(e.message || 'Ocurrió un error inesperado.');
       toast({
         variant: 'destructive',
-        title: 'Analysis Failed',
-        description: e.message || 'An unexpected error occurred.',
+        title: 'Falló el Análisis',
+        description: e.message || 'Ocurrió un error inesperado.',
       });
     } finally {
       setIsLoading(false);
@@ -36,14 +36,14 @@ export default function AnalysisPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold font-headline">AI-Powered Transaction Analysis</h1>
+      <h1 className="text-3xl font-bold font-headline">Análisis de Transacciones con IA</h1>
       
       {!analysisResult && (
         <Card>
           <CardHeader>
-            <CardTitle>Unlock Financial Insights</CardTitle>
+            <CardTitle>Desbloquea Información Financiera</CardTitle>
             <CardDescription>
-              Use the power of Generative AI to get a summary of your recent transactions, categorize your spending, and receive personalized suggestions for financial improvement.
+              Usa el poder de la IA Generativa para obtener un resumen de tus transacciones recientes, categorizar tus gastos y recibir sugerencias personalizadas para mejorar tus finanzas.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -51,12 +51,12 @@ export default function AnalysisPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing...
+                  Analizando...
                 </>
               ) : (
                 <>
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Analyze My Transactions
+                  Analizar Mis Transacciones
                 </>
               )}
             </Button>
@@ -67,7 +67,7 @@ export default function AnalysisPage() {
       {error && (
         <Card className="border-destructive bg-destructive/10">
           <CardHeader>
-            <CardTitle className="text-destructive">Analysis Error</CardTitle>
+            <CardTitle className="text-destructive">Error de Análisis</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-destructive">{error}</p>

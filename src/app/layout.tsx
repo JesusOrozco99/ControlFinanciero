@@ -12,7 +12,7 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   title: 'FinTrackr',
-  description: 'Your Personal Finance Companion',
+  description: 'Tu Asistente Financiero Personal',
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body className={`${roboto.variable} font-body antialiased`}>
         <AuthProvider>
           {children}

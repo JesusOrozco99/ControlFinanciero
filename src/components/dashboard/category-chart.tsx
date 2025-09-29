@@ -24,7 +24,7 @@ export default function CategoryChart({ transactions }: CategoryChartProps) {
     if (data.length === 0) {
         return (
             <div className="flex h-[350px] w-full items-center justify-center text-muted-foreground">
-                No expense data for this month.
+                No hay datos de gastos para este mes.
             </div>
         )
     }

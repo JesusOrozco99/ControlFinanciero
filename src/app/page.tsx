@@ -13,10 +13,10 @@ export default function LandingPage() {
         <Logo />
         <nav className="flex items-center gap-4">
           <Button variant="ghost" asChild>
-            <Link href="/login">Login</Link>
+            <Link href="/login">Iniciar Sesión</Link>
           </Button>
           <Button asChild>
-            <Link href="/signup">Get Started</Link>
+            <Link href="/signup">Empezar</Link>
           </Button>
         </nav>
       </header>
@@ -24,17 +24,17 @@ export default function LandingPage() {
         <section className="container mx-auto grid grid-cols-1 items-center gap-12 px-4 py-12 md:grid-cols-2 md:px-6 lg:py-24">
           <div className="space-y-6 text-center md:text-left">
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl font-headline">
-              Welcome to <span className="text-gradient">FinTrackr</span>
+              Bienvenido a <span className="text-gradient">FinTrackr</span>
             </h1>
             <p className="text-lg text-muted-foreground md:text-xl">
-              Your Personal Finance Companion. Track income, manage expenses, and gain powerful insights into your spending habits with AI-powered analysis.
+              Tu Asistente Financiero Personal. Registra ingresos, gestiona gastos y obtén información valiosa sobre tus hábitos de consumo con análisis potenciado por IA.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center md:justify-start">
               <Button size="lg" asChild>
-                <Link href="/signup">Sign Up for Free</Link>
+                <Link href="/signup">Regístrate Gratis</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="/login">Login</Link>
+                <Link href="/login">Iniciar Sesión</Link>
               </Button>
             </div>
           </div>
@@ -53,7 +53,7 @@ export default function LandingPage() {
         </section>
       </main>
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground md:px-6">
-        <p>&copy; {new Date().getFullYear()} FinTrackr. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} FinTrackr. Todos los derechos reservados.</p>
       </footer>
     </div>
   );

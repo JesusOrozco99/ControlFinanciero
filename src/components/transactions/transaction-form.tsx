@@ -35,11 +35,11 @@ import { useState } from 'react';
 
 const formSchema = z.object({
   date: z.date({
-    required_error: 'A date is required.',
+    required_error: 'Se requiere una fecha.',
   }),
-  description: z.string().min(2, 'Description must be at least 2 characters.'),
-  amount: z.coerce.number().positive('Amount must be a positive number.'),
-  category: z.string().min(1, 'Please select a category.'),
+  description: z.string().min(2, 'La descripción debe tener al menos 2 caracteres.'),
+  amount: z.coerce.number().positive('El monto debe ser un número positivo.'),
+  category: z.string().min(1, 'Por favor, selecciona una categoría.'),
 });
 
 type TransactionFormProps = {
@@ -82,7 +82,7 @@ export function TransactionForm({ type, onSubmit, initialData }: TransactionForm
           name="date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Date</FormLabel>
+              <FormLabel>Fecha</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -96,7 +96,7 @@ export function TransactionForm({ type, onSubmit, initialData }: TransactionForm
                       {field.value ? (
                         format(field.value, 'PPP')
                       ) : (
-                        <span>Pick a date</span>
+                        <span>Elige una fecha</span>
                       )}
                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
@@ -124,9 +124,9 @@ export function TransactionForm({ type, onSubmit, initialData }: TransactionForm
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>Descripción</FormLabel>
               <FormControl>
-                <Input placeholder="e.g. Monthly salary" {...field} />
+                <Input placeholder="ej. Salario mensual" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -138,7 +138,7 @@ export function TransactionForm({ type, onSubmit, initialData }: TransactionForm
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>Monto</FormLabel>
               <FormControl>
                 <Input type="number" placeholder="0.00" {...field} />
               </FormControl>
@@ -152,11 +152,11 @@ export function TransactionForm({ type, onSubmit, initialData }: TransactionForm
           name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel>Categoría</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder="Selecciona una categoría" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -174,7 +174,7 @@ export function TransactionForm({ type, onSubmit, initialData }: TransactionForm
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {initialData ? 'Save Changes' : 'Add Transaction'}
+          {initialData ? 'Guardar Cambios' : 'Añadir Transacción'}
         </Button>
       </form>
     </Form>

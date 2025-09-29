@@ -6,15 +6,15 @@ import type { Transaction } from "./types";
 
 export async function runAnalysis() {
   try {
-    // In a real app, you would fetch these from your database
+    // En una aplicación real, obtendrías esto de tu base de datos
     const recentTransactions: Transaction[] = transactions.map(t => ({...t, amount: Math.abs(t.amount)}));
     
-    // Create a simple historical summary. In a real app, this would be more complex.
+    // Crea un resumen histórico simple. En una aplicación real, esto sería más complejo.
     const totalSpending = recentTransactions
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0);
     
-    const historicalSpendingData = `User's total spending in the observed period is $${totalSpending.toFixed(2)}. Common spending categories include groceries, rent, and dining out.`;
+    const historicalSpendingData = `El gasto total del usuario en el período observado es de $${totalSpending.toFixed(2)}. Las categorías de gasto comunes incluyen supermercado, alquiler y restaurantes.`;
 
     const result = await summarizeAndCategorizeTransactions({
       transactions: recentTransactions,
@@ -23,8 +23,8 @@ export async function runAnalysis() {
     
     return result;
   } catch (error) {
-    console.error("Error running analysis:", error);
-    // In a real app, you would handle this error more gracefully
-    throw new Error("Failed to run analysis. Please try again later.");
+    console.error("Error al ejecutar el análisis:", error);
+    // En una aplicación real, manejarías este error de forma más elegante
+    throw new Error("No se pudo ejecutar el análisis. Por favor, inténtalo de nuevo más tarde.");
   }
 }

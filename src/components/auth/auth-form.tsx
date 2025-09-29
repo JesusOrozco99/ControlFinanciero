@@ -27,10 +27,10 @@ import Logo from '@/components/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 const formSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address.' }),
+  email: z.string().email({ message: 'Dirección de correo inválida.' }),
   password: z
     .string()
-    .min(6, { message: 'Password must be at least 6 characters.' }),
+    .min(6, { message: 'La contraseña debe tener al menos 6 caracteres.' }),
 });
 
 type AuthFormProps = {
@@ -60,21 +60,21 @@ export default function AuthForm({ mode }: AuthFormProps) {
           values.password
         );
         toast({
-          title: 'Account created!',
-          description: 'You have been successfully signed up.',
+          title: '¡Cuenta creada!',
+          description: 'Te has registrado exitosamente.',
         });
       } else {
         await signInWithEmailAndPassword(auth, values.email, values.password);
         toast({
-          title: 'Logged in!',
-          description: 'Welcome back.',
+          title: '¡Has iniciado sesión!',
+          description: 'Bienvenido de nuevo.',
         });
       }
       router.push('/dashboard');
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Authentication Error',
+        title: 'Error de Autenticación',
         description: error.message,
       });
     } finally {
@@ -90,12 +90,12 @@ export default function AuthForm({ mode }: AuthFormProps) {
               <Logo />
             </div>
             <CardTitle className="text-2xl">
-              {mode === 'login' ? 'Welcome Back' : 'Create an Account'}
+              {mode === 'login' ? 'Bienvenido de Nuevo' : 'Crea una Cuenta'}
             </CardTitle>
             <CardDescription>
               {mode === 'login'
-                ? 'Enter your credentials to access your account.'
-                : 'Enter your email and password to sign up.'}
+                ? 'Ingresa tus credenciales para acceder a tu cuenta.'
+                : 'Ingresa tu correo y contraseña para registrarte.'}
             </CardDescription>
         </CardHeader>
         <CardContent>
@@ -106,10 +106,10 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Correo Electrónico</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="you@example.com"
+                        placeholder="tu@ejemplo.com"
                         {...field}
                         disabled={isLoading}
                       />
@@ -123,7 +123,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Contraseña</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
@@ -140,7 +140,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 {isLoading && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                {mode === 'login' ? 'Login' : 'Sign Up'}
+                {mode === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
               </Button>
             </form>
           </Form>
@@ -148,16 +148,16 @@ export default function AuthForm({ mode }: AuthFormProps) {
           <div className="mt-6 text-center text-sm">
             {mode === 'login' ? (
               <>
-                Don&apos;t have an account?{' '}
+                ¿No tienes una cuenta?{' '}
                 <Link href="/signup" className="font-medium text-primary hover:underline">
-                  Sign up
+                  Regístrate
                 </Link>
               </>
             ) : (
               <>
-                Already have an account?{' '}
+                ¿Ya tienes una cuenta?{' '}
                 <Link href="/login" className="font-medium text-primary hover:underline">
-                  Login
+                  Inicia Sesión
                 </Link>
               </>
             )}

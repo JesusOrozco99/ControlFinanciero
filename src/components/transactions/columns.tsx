@@ -33,12 +33,12 @@ type ColumnsProps = {
 export const columns = ({ onUpdate, onDelete, transactionType }: ColumnsProps): ColumnDef<Transaction>[] => [
   {
     accessorKey: 'description',
-    header: 'Description',
+    header: 'Descripción',
     cell: ({ row }) => <div className="font-medium">{row.getValue('description')}</div>
   },
   {
     accessorKey: 'amount',
-    header: () => <div className="text-right">Amount</div>,
+    header: () => <div className="text-right">Monto</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount'));
       return <div className="text-right">{currencyFormatter.format(amount)}</div>;
@@ -46,7 +46,7 @@ export const columns = ({ onUpdate, onDelete, transactionType }: ColumnsProps): 
   },
   {
     accessorKey: 'category',
-    header: 'Category',
+    header: 'Categoría',
     cell: ({ row }) => {
       const categoryValue = row.getValue('category') as string;
       const category = categories.find((c) => c.value === categoryValue);
@@ -58,7 +58,7 @@ export const columns = ({ onUpdate, onDelete, transactionType }: ColumnsProps): 
   },
   {
     accessorKey: 'date',
-    header: 'Date',
+    header: 'Fecha',
     cell: ({ row }) => {
       const date = new Date(row.getValue('date'));
       // Add timezone offset to prevent date from changing
@@ -77,34 +77,34 @@ export const columns = ({ onUpdate, onDelete, transactionType }: ColumnsProps): 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">Abrir menú</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(transaction.id)}
               >
-                Copy transaction ID
+                Copiar ID de transacción
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DialogTrigger asChild>
                 <DropdownMenuItem>
-                  <Edit className="mr-2 h-4 w-4" /> Edit
+                  <Edit className="mr-2 h-4 w-4" /> Editar
                 </DropdownMenuItem>
               </DialogTrigger>
               <DropdownMenuItem
                 className="text-red-500 focus:text-red-500"
                 onClick={() => onDelete(transaction.id)}
               >
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                <Trash2 className="mr-2 h-4 w-4" /> Eliminar
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <DialogContent>
             <DialogHeader>
-                <DialogTitle>Edit Transaction</DialogTitle>
+                <DialogTitle>Editar Transacción</DialogTitle>
             </DialogHeader>
             <TransactionForm
               type={transactionType}

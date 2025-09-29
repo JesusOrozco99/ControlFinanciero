@@ -19,19 +19,19 @@ export default function SummaryCards({
 }: SummaryCardsProps) {
   const summaryData = [
     {
-      title: "This Month's Income",
+      title: "Ingresos de este Mes",
       amount: totalIncome,
       icon: ArrowUpRight,
       color: 'text-green-500',
     },
     {
-      title: "This Month's Expenses",
+      title: "Egresos de este Mes",
       amount: totalExpenses,
       icon: ArrowDownLeft,
       color: 'text-red-500',
     },
     {
-      title: 'Current Balance',
+      title: 'Saldo Actual',
       amount: balance,
       icon: Scale,
       color: balance >= 0 ? 'text-blue-500' : 'text-orange-500',

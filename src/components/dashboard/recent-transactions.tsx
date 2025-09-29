@@ -39,7 +39,7 @@ export default function RecentTransactions({
           </div>
         ))
       ) : (
-        <p className="text-sm text-muted-foreground">No recent transactions.</p>
+        <p className="text-sm text-muted-foreground">No hay transacciones recientes.</p>
       )}
     </div>
   );
