@@ -4,7 +4,7 @@
 
 // Lee la URL base de la API desde las variables de entorno.
 // Si no está definida, usa una URL local por defecto para desarrollo.
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000/api';
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000/api/v1';
 
 export const apiConfig = {
   baseUrl,
@@ -17,11 +17,11 @@ export const apiConfig = {
       delete: (id: string) => `/transactions/${id}`,
     },
     users: {
-      create: '/users', // Endpoint para el registro de nuevos usuarios
+      create: '/auth/register', // Endpoint para el registro de nuevos usuarios
     },
     // Puedes añadir más endpoints aquí a medida que tu aplicación crezca
-    // reports: {
-    //   getMonthly: '/reports/monthly',
-    // }
+    dashboard: {
+      getdashboard: '/dashboard',
+    }
   },
 };
