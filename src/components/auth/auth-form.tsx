@@ -25,6 +25,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import Logo from '@/components/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import type { UserPayload } from '@/lib/types';
+import { createUser } from '@/services/api-service';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Dirección de correo inválida.' }),
@@ -86,8 +88,8 @@ export default function AuthForm({ mode }: AuthFormProps) {
           signupValues.password
         );
 
-        // Luego, preparamos el payload para tu API con la estructura solicitada
-        const userPayload = {
+        // Luego, preparamos el payload para tu API
+        const userPayload: UserPayload = {
           user: {
             email: signupValues.email,
             password: signupValues.password,
@@ -97,22 +99,23 @@ export default function AuthForm({ mode }: AuthFormProps) {
           }
         };
 
-        // Aquí puedes enviar los datos a tu API.
-        // He descomentado y actualizado la línea de fetch.
-        // Reemplaza '/api/your-endpoint' con la ruta real de tu API.
+        // Descomenta el siguiente bloque para enviar los datos a tu API.
         /*
-        const response = await fetch('/api/your-endpoint', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(userPayload),
-        });
-
-        if (!response.ok) {
+        try {
+          await createUser(userPayload);
+        } catch (apiError) {
           // Si tu API falla, podrías querer manejar el error.
           // Por ejemplo, podrías eliminar el usuario recién creado de Firebase.
-          throw new Error('Error al registrar el usuario en el sistema propio.');
+          console.error("Error al registrar el usuario en el API propio:", apiError);
+          // Opcional: Mostrar un toast de error específico para el API
+          toast({
+            variant: 'destructive',
+            title: 'Error de Registro Interno',
+            description: 'No se pudo completar el registro en nuestro sistema.',
+          });
+          // Importante: Volver a lanzar el error o manejarlo para que el flujo no continue
+          // como si todo hubiera sido exitoso.
+          throw apiError; 
         }
         */
 
@@ -130,10 +133,20 @@ export default function AuthForm({ mode }: AuthFormProps) {
       }
       router.push('/dashboard');
     } catch (error: any) {
+      // Captura errores de Firebase Auth o del API
+      const firebaseErrorMessages: { [key: string]: string } = {
+        'auth/email-already-in-use': 'Este correo electrónico ya está en uso.',
+        'auth/invalid-email': 'El formato del correo electrónico es inválido.',
+        'auth/weak-password': 'La contraseña es demasiado débil.',
+        'auth/user-not-found': 'No se encontró un usuario con ese correo.',
+        'auth/wrong-password': 'La contraseña es incorrecta.',
+      };
+      const errorMessage = firebaseErrorMessages[error.code] || 'Ocurrió un error inesperado durante la autenticación.';
+
       toast({
         variant: 'destructive',
         title: 'Error de Autenticación',
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
