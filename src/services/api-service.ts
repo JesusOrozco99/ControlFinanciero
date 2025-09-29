@@ -1,8 +1,7 @@
-import type { Transaction, UserPayload } from '@/lib/types';
+import type { Transaction, UserPayload, ApiUser } from '@/lib/types';
 import { transactions as fallbackTransactions } from '@/lib/data';
 import { apiConfig } from '@/lib/api-config';
 import axios, { type AxiosRequestConfig } from 'axios';
-import { auth } from '@/lib/firebase';
 
 const axiosInstance = axios.create({
     baseURL: apiConfig.baseUrl,
@@ -13,10 +12,9 @@ const axiosInstance = axios.create({
 
 // Interceptor para añadir el token de autenticación a cada petición
 axiosInstance.interceptors.request.use(
-    async (config) => {
-        const user = auth.currentUser;
-        if (user) {
-            const token = await user.getIdToken();
+    (config) => {
+        const token = localStorage.getItem('authToken');
+        if (token && !config.headers.Authorization) {
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
@@ -39,10 +37,9 @@ async function apiRequest(config: AxiosRequestConfig): Promise<any> {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             console.error(`Error de API (${error.response?.status}) en ${config.url}:`, error.response?.data);
-             // Si el error es 401 o 403, podría ser útil manejarlo de forma especial
-            if (error.response?.status === 401 || error.response?.status === 403) {
-                 console.error("Error de autenticación o autorización. El token puede ser inválido o haber expirado.");
-                 // Podrías añadir lógica aquí para refrescar el token o redirigir al login
+            if (error.response?.status === 401) {
+                 console.error("Error de autenticación. El token puede ser inválido o haber expirado.");
+                 // Aquí podrías disparar un evento global o usar un interceptor de respuesta para hacer logout
             }
         } else {
             console.error('Hubo un problema con la petición de axios:', error);
@@ -51,6 +48,48 @@ async function apiRequest(config: AxiosRequestConfig): Promise<any> {
     }
 }
 
+// --- Auth Service ---
+
+export async function loginUser(email: string, password: string): Promise<{ token: string; user: ApiUser }> {
+    try {
+        return await apiRequest({
+            method: 'POST',
+            url: apiConfig.endpoints.users.login,
+            data: { email, password },
+        });
+    } catch (error) {
+        console.error("No se pudo iniciar sesión a través de la API.");
+        throw error;
+    }
+}
+
+export async function createUser(payload: UserPayload): Promise<ApiUser> {
+    try {
+        return await apiRequest({
+            method: 'POST',
+            url: apiConfig.endpoints.users.create,
+            data: payload,
+        });
+    } catch (error) {
+        console.error("No se pudo crear el usuario a través de la API.");
+        throw error;
+    }
+}
+
+export async function getUserProfile(): Promise<ApiUser> {
+    try {
+        return await apiRequest({
+            method: 'GET',
+            url: apiConfig.endpoints.users.profile,
+        });
+    } catch (error) {
+        console.error("No se pudo obtener el perfil del usuario.");
+        throw error;
+    }
+}
+
+
+// --- Transaction Service ---
 
 export async function getTransactions(): Promise<Transaction[]> {
     try {
@@ -99,19 +138,6 @@ export async function deleteTransaction(id: string): Promise<void> {
         });
     } catch (error) {
         console.error("No se pudo eliminar la transacción a través de la API.");
-        throw error;
-    }
-}
-
-export async function createUser(payload: UserPayload): Promise<any> {
-    try {
-        return await apiRequest({
-            method: 'POST',
-            url: apiConfig.endpoints.users.create,
-            data: payload,
-        });
-    } catch (error) {
-        console.error("No se pudo crear el usuario a través de la API.");
         throw error;
     }
 }

@@ -4,8 +4,6 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/auth-provider';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import {
   LayoutDashboard,
   ArrowUpRight,
@@ -76,7 +74,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -86,7 +84,7 @@ export default function DashboardLayout({
   }, [user, loading, router]);
 
   const handleLogout = async () => {
-    await signOut(auth);
+    logout();
     router.push('/login');
   };
 
@@ -114,6 +112,7 @@ export default function DashboardLayout({
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 w-full justify-start gap-2 px-2">
                 <Avatar className="h-8 w-8">
+                  {/* Asumiendo que tu API de usuario devuelve un `photoURL` */}
                   <AvatarImage src={user.photoURL ?? ''} />
                   <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
                 </Avatar>

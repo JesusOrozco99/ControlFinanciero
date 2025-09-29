@@ -1,32 +1,62 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, type User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { ApiUser } from '@/lib/types';
+import { getUserProfile } from '@/services/api-service';
+
 
 type AuthContextType = {
-  user: User | null;
+  user: ApiUser | null;
+  token: string | null;
   loading: boolean;
+  login: (user: ApiUser, token: string) => void;
+  logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  token: null,
   loading: true,
+  login: () => {},
+  logout: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<ApiUser | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
+  const logout = useCallback(() => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('authToken');
   }, []);
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const storedToken = localStorage.getItem('authToken');
+      if (storedToken) {
+        setToken(storedToken);
+        try {
+          // Asumimos que tienes un endpoint para obtener el perfil del usuario
+          const userProfile = await getUserProfile(); 
+          setUser(userProfile);
+        } catch (error) {
+          console.error('La sesión expiró o es inválida.');
+          logout(); // Limpia si el token es inválido
+        }
+      }
+      setLoading(false);
+    };
+    initializeAuth();
+  }, [logout]);
+  
+  const login = (newUser: ApiUser, newToken: string) => {
+    setUser(newUser);
+    setToken(newToken);
+    localStorage.setItem('authToken', newToken);
+  };
 
   if (loading) {
     return (
@@ -43,7 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

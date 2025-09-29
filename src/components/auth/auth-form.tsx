@@ -6,11 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -26,7 +21,9 @@ import { Loader2 } from 'lucide-react';
 import Logo from '@/components/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import type { UserPayload } from '@/lib/types';
-import { createUser } from '@/services/api-service';
+import { createUser, loginUser } from '@/services/api-service';
+import { useAuth } from '@/providers/auth-provider';
+
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Dirección de correo inválida.' }),
@@ -57,6 +54,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
 
   const isSignup = mode === 'signup';
   const formSchema = isSignup ? signupSchema : loginSchema;
@@ -81,17 +79,6 @@ export default function AuthForm({ mode }: AuthFormProps) {
       if (isSignup) {
         const signupValues = values as SignupFormValues;
         
-        // Primero, creamos el usuario en Firebase Authentication
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          signupValues.email,
-          signupValues.password
-        );
-        
-        // Es importante esperar a que el usuario se cree para obtener el token
-        await userCredential.user.getIdToken();
-
-        // Luego, preparamos el payload para tu API
         const userPayload: UserPayload = {
           user: {
             email: signupValues.email,
@@ -101,50 +88,27 @@ export default function AuthForm({ mode }: AuthFormProps) {
             last_name: signupValues.last_name,
           }
         };
-
-        // Descomenta el siguiente bloque para enviar los datos a tu API.
-        try {
-          await createUser(userPayload);
-        } catch (apiError) {
-          // Si tu API falla, podrías querer manejar el error.
-          // Por ejemplo, podrías eliminar el usuario recién creado de Firebase.
-          console.error("Error al registrar el usuario en el API propio:", apiError);
-          // Opcional: Mostrar un toast de error específico para el API
-          toast({
-            variant: 'destructive',
-            title: 'Error de Registro Interno',
-            description: 'No se pudo completar el registro en nuestro sistema.',
-          });
-          // Importante: Volver a lanzar el error o manejarlo para que el flujo no continue
-          // como si todo hubiera sido exitoso.
-          await userCredential.user.delete(); // Limpia el usuario de Firebase si el backend falla
-          throw apiError; 
-        }
+        
+        await createUser(userPayload);
 
         toast({
           title: '¡Cuenta creada!',
-          description: 'Te has registrado exitosamente.',
+          description: 'Te has registrado exitosamente. Ahora inicia sesión.',
         });
+        router.push('/login');
+
       } else {
         const loginValues = values as LoginFormValues;
-        await signInWithEmailAndPassword(auth, loginValues.email, loginValues.password);
+        const { token, user } = await loginUser(loginValues.email, loginValues.password);
+        login(user, token);
         toast({
           title: '¡Has iniciado sesión!',
           description: 'Bienvenido de nuevo.',
         });
+        router.push('/dashboard');
       }
-      router.push('/dashboard');
     } catch (error: any) {
-      // Captura errores de Firebase Auth o del API
-      const firebaseErrorMessages: { [key: string]: string } = {
-        'auth/email-already-in-use': 'Este correo electrónico ya está en uso.',
-        'auth/invalid-email': 'El formato del correo electrónico es inválido.',
-        'auth/weak-password': 'La contraseña es demasiado débil.',
-        'auth/user-not-found': 'No se encontró un usuario con ese correo.',
-        'auth/wrong-password': 'La contraseña es incorrecta.',
-        'auth/network-request-failed': 'Error de red. Por favor, revisa tu conexión a internet.'
-      };
-      const errorMessage = firebaseErrorMessages[error.code] || 'Ocurrió un error inesperado durante la autenticación.';
+      const errorMessage = error.response?.data?.message || 'Ocurrió un error inesperado durante la autenticación.';
 
       toast({
         variant: 'destructive',

@@ -17,9 +17,10 @@ export const apiConfig = {
       delete: (id: string) => `/transactions/${id}`,
     },
     users: {
-      create: '/auth/register', // Endpoint para el registro de nuevos usuarios
+      create: '/auth/register',
+      login: '/auth/login',
+      profile: '/auth/profile', // Endpoint para obtener el perfil del usuario autenticado
     },
-    // Puedes añadir más endpoints aquí a medida que tu aplicación crezca
     dashboard: {
       getdashboard: '/dashboard',
     }
