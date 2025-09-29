@@ -77,24 +77,50 @@ export default function AuthForm({ mode }: AuthFormProps) {
     setIsLoading(true);
     try {
       if (isSignup) {
-        // Asegurarse de que values es del tipo correcto para signup
         const signupValues = values as SignupFormValues;
+        
+        // Primero, creamos el usuario en Firebase Authentication
         await createUserWithEmailAndPassword(
           auth,
           signupValues.email,
           signupValues.password
         );
-        // Aquí podrías enviar los datos adicionales (first_name, last_name) a tu API
-        // const { first_name, last_name, password_confirmation } = signupValues;
-        // const userPayload = { user: { email: signupValues.email, password: signupValues.password, password_confirmation, first_name, last_name } };
-        // await fetch('/api/your-endpoint', { method: 'POST', body: JSON.stringify(userPayload) });
+
+        // Luego, preparamos el payload para tu API con la estructura solicitada
+        const userPayload = {
+          user: {
+            email: signupValues.email,
+            password: signupValues.password,
+            password_confirmation: signupValues.password_confirmation,
+            first_name: signupValues.first_name,
+            last_name: signupValues.last_name,
+          }
+        };
+
+        // Aquí puedes enviar los datos a tu API.
+        // He descomentado y actualizado la línea de fetch.
+        // Reemplaza '/api/your-endpoint' con la ruta real de tu API.
+        /*
+        const response = await fetch('/api/your-endpoint', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userPayload),
+        });
+
+        if (!response.ok) {
+          // Si tu API falla, podrías querer manejar el error.
+          // Por ejemplo, podrías eliminar el usuario recién creado de Firebase.
+          throw new Error('Error al registrar el usuario en el sistema propio.');
+        }
+        */
 
         toast({
           title: '¡Cuenta creada!',
           description: 'Te has registrado exitosamente.',
         });
       } else {
-         // Asegurarse de que values es del tipo correcto para login
         const loginValues = values as LoginFormValues;
         await signInWithEmailAndPassword(auth, loginValues.email, loginValues.password);
         toast({
