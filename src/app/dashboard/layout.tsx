@@ -13,6 +13,7 @@ import {
   Sparkles,
   LogOut,
   User as UserIcon,
+  Menu,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -22,7 +23,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarTrigger,
+  SidebarToggle,
   SidebarProvider,
   SidebarInset,
 } from '@/components/ui/sidebar';
@@ -37,6 +38,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Logo from '@/components/logo';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Panel' },
@@ -45,6 +47,30 @@ const navItems = [
   { href: '/dashboard/analysis', icon: Sparkles, label: 'Análisis IA' },
 ];
 
+function NavContent() {
+  const pathname = usePathname();
+  const { isCollapsed } = useSidebar();
+
+  return (
+    <SidebarMenu>
+      {navItems.map((item) => (
+        <SidebarMenuItem key={item.href}>
+          <Link href={item.href} passHref legacyBehavior>
+            <SidebarMenuButton
+              isActive={pathname === item.href}
+              isCollapsed={isCollapsed}
+              tooltip={item.label}
+            >
+              <item.icon />
+              <span>{item.label}</span>
+            </SidebarMenuButton>
+          </Link>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
+}
+
 export default function DashboardLayout({
   children,
 }: {
@@ -52,7 +78,6 @@ export default function DashboardLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -66,7 +91,6 @@ export default function DashboardLayout({
   };
 
   if (loading || !user) {
-    // AuthProvider already shows a loading skeleton
     return null;
   }
 
@@ -80,23 +104,10 @@ export default function DashboardLayout({
       <Sidebar>
         <SidebarHeader>
           <Logo />
+          <SidebarToggle />
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu>
-            {navItems.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <Link href={item.href} passHref legacyBehavior>
-                  <SidebarMenuButton
-                    isActive={pathname === item.href}
-                    tooltip={item.label}
-                  >
-                    <item.icon />
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
+          <NavContent />
         </SidebarContent>
         <SidebarFooter>
           <DropdownMenu>
@@ -127,10 +138,26 @@ export default function DashboardLayout({
           </DropdownMenu>
         </SidebarFooter>
       </Sidebar>
+
       <SidebarInset>
         <header className="flex h-16 items-center justify-between border-b bg-card px-4 md:hidden">
           <Logo />
-          <SidebarTrigger />
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu />
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 p-0">
+                <SidebarHeader className='px-4'>
+                    <Logo />
+                </SidebarHeader>
+                <div className='p-2'>
+                    <NavContent />
+                </div>
+            </SheetContent>
+          </Sheet>
         </header>
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
           {children}
