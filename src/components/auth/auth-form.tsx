@@ -26,45 +26,77 @@ import { Loader2 } from 'lucide-react';
 import Logo from '@/components/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
-const formSchema = z.object({
+const loginSchema = z.object({
   email: z.string().email({ message: 'Dirección de correo inválida.' }),
   password: z
     .string()
     .min(6, { message: 'La contraseña debe tener al menos 6 caracteres.' }),
 });
 
+const signupSchema = z.object({
+  first_name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres.'),
+  last_name: z.string().min(2, 'El apellido debe tener al menos 2 caracteres.'),
+  email: z.string().email({ message: 'Dirección de correo inválida.' }),
+  password: z.string().min(6, { message: 'La contraseña debe tener al menos 6 caracteres.' }),
+  password_confirmation: z.string()
+}).refine((data) => data.password === data.password_confirmation, {
+  message: "Las contraseñas no coinciden.",
+  path: ["password_confirmation"],
+});
+
 type AuthFormProps = {
   mode: 'login' | 'signup';
 };
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const isSignup = mode === 'signup';
+  const formSchema = isSignup ? signupSchema : loginSchema;
+
+  const form = useForm<LoginFormValues | SignupFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues: isSignup ? {
+      first_name: '',
+      last_name: '',
+      email: '',
+      password: '',
+      password_confirmation: '',
+    } : {
       email: '',
       password: '',
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: LoginFormValues | SignupFormValues) => {
     setIsLoading(true);
     try {
-      if (mode === 'signup') {
+      if (isSignup) {
+        // Asegurarse de que values es del tipo correcto para signup
+        const signupValues = values as SignupFormValues;
         await createUserWithEmailAndPassword(
           auth,
-          values.email,
-          values.password
+          signupValues.email,
+          signupValues.password
         );
+        // Aquí podrías enviar los datos adicionales (first_name, last_name) a tu API
+        // const { first_name, last_name, password_confirmation } = signupValues;
+        // const userPayload = { user: { email: signupValues.email, password: signupValues.password, password_confirmation, first_name, last_name } };
+        // await fetch('/api/your-endpoint', { method: 'POST', body: JSON.stringify(userPayload) });
+
         toast({
           title: '¡Cuenta creada!',
           description: 'Te has registrado exitosamente.',
         });
       } else {
-        await signInWithEmailAndPassword(auth, values.email, values.password);
+         // Asegurarse de que values es del tipo correcto para login
+        const loginValues = values as LoginFormValues;
+        await signInWithEmailAndPassword(auth, loginValues.email, loginValues.password);
         toast({
           title: '¡Has iniciado sesión!',
           description: 'Bienvenido de nuevo.',
@@ -90,17 +122,49 @@ export default function AuthForm({ mode }: AuthFormProps) {
               <Logo />
             </div>
             <CardTitle className="text-2xl">
-              {mode === 'login' ? 'Bienvenido de Nuevo' : 'Crea una Cuenta'}
+              {isSignup ? 'Crea una Cuenta' : 'Bienvenido de Nuevo'}
             </CardTitle>
             <CardDescription>
-              {mode === 'login'
-                ? 'Ingresa tus credenciales para acceder a tu cuenta.'
-                : 'Ingresa tu correo y contraseña para registrarte.'}
+              {isSignup
+                ? 'Ingresa tus datos para registrarte.'
+                : 'Ingresa tus credenciales para acceder a tu cuenta.'}
             </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {isSignup && (
+                <>
+                  <div className="flex gap-4">
+                    <FormField
+                      control={form.control}
+                      name="first_name"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Nombre</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Juan" {...field} disabled={isLoading} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="last_name"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Apellido</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Pérez" {...field} disabled={isLoading} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </>
+              )}
               <FormField
                 control={form.control}
                 name="email"
@@ -136,11 +200,31 @@ export default function AuthForm({ mode }: AuthFormProps) {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              {isSignup && (
+                <FormField
+                  control={form.control}
+                  name="password_confirmation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirmar Contraseña</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
+                          disabled={isLoading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              <Button type="submit" className="w-full !mt-6" disabled={isLoading}>
                 {isLoading && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                {mode === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
+                {isSignup ? 'Registrarse' : 'Iniciar Sesión'}
               </Button>
             </form>
           </Form>
