@@ -1,12 +1,13 @@
-"use server";
+'use server';
 
-import { summarizeAndCategorizeTransactions } from "@/ai/flows/transaction-summary-and-categorization";
-import { transactions } from "./data";
-import type { Transaction } from "./types";
+import { summarizeAndCategorizeTransactions } from '@/ai/flows/transaction-summary-and-categorization';
+import { getTransactions } from '@/services/api-service';
+import type { Transaction } from './types';
 
 export async function runAnalysis() {
   try {
-    // En una aplicación real, obtendrías esto de tu base de datos
+    // En una aplicación real, obtendrías esto de tu base de datos o API
+    const transactions = await getTransactions();
     const recentTransactions: Transaction[] = transactions.map(t => ({...t, amount: Math.abs(t.amount)}));
     
     // Crea un resumen histórico simple. En una aplicación real, esto sería más complejo.

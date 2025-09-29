@@ -16,6 +16,8 @@ export const categories: Category[] = [
   { value: 'other-expense', label: 'Otros', type: 'expense' },
 ];
 
+// Estos datos de transacciones ahora son un respaldo en caso de que la API no responda.
+// La aplicación intentará obtener los datos de tu API primero.
 export const transactions: Transaction[] = [
   { id: '1', date: new Date(new Date().setDate(1)).toISOString().split('T')[0], description: 'Salario Mensual', amount: 5000, type: 'income', category: 'salary' },
   { id: '2', date: new Date(new Date().setDate(2)).toISOString().split('T')[0], description: 'Compras en el supermercado', amount: 75.50, type: 'expense', category: 'groceries' },
