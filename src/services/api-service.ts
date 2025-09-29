@@ -2,6 +2,7 @@ import type { Transaction, UserPayload } from '@/lib/types';
 import { transactions as fallbackTransactions } from '@/lib/data';
 import { apiConfig } from '@/lib/api-config';
 import axios, { type AxiosRequestConfig } from 'axios';
+import { auth } from '@/lib/firebase';
 
 const axiosInstance = axios.create({
     baseURL: apiConfig.baseUrl,
@@ -9,6 +10,22 @@ const axiosInstance = axios.create({
         'Content-Type': 'application/json',
     },
 });
+
+// Interceptor para añadir el token de autenticación a cada petición
+axiosInstance.interceptors.request.use(
+    async (config) => {
+        const user = auth.currentUser;
+        if (user) {
+            const token = await user.getIdToken();
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 
 async function apiRequest(config: AxiosRequestConfig): Promise<any> {
     if (!apiConfig.baseUrl) {
@@ -22,6 +39,11 @@ async function apiRequest(config: AxiosRequestConfig): Promise<any> {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             console.error(`Error de API (${error.response?.status}) en ${config.url}:`, error.response?.data);
+             // Si el error es 401 o 403, podría ser útil manejarlo de forma especial
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                 console.error("Error de autenticación o autorización. El token puede ser inválido o haber expirado.");
+                 // Podrías añadir lógica aquí para refrescar el token o redirigir al login
+            }
         } else {
             console.error('Hubo un problema con la petición de axios:', error);
         }
@@ -48,7 +70,7 @@ export async function addTransaction(transaction: Omit<Transaction, 'id'>): Prom
         return await apiRequest({
             method: 'POST',
             url: apiConfig.endpoints.transactions.create,
-            data: transaction,
+            data: { transaction },
         });
     } catch (error) {
         console.error("No se pudo añadir la transacción a través de la API.");
@@ -61,7 +83,7 @@ export async function updateTransaction(id: string, transaction: Partial<Transac
         return await apiRequest({
             method: 'PUT',
             url: apiConfig.endpoints.transactions.update(id),
-            data: transaction,
+            data: { transaction },
         });
     } catch (error) {
         console.error("No se pudo actualizar la transacción a través de la API.");

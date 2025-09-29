@@ -82,11 +82,14 @@ export default function AuthForm({ mode }: AuthFormProps) {
         const signupValues = values as SignupFormValues;
         
         // Primero, creamos el usuario en Firebase Authentication
-        await createUserWithEmailAndPassword(
+        const userCredential = await createUserWithEmailAndPassword(
           auth,
           signupValues.email,
           signupValues.password
         );
+        
+        // Es importante esperar a que el usuario se cree para obtener el token
+        await userCredential.user.getIdToken();
 
         // Luego, preparamos el payload para tu API
         const userPayload: UserPayload = {
@@ -100,7 +103,6 @@ export default function AuthForm({ mode }: AuthFormProps) {
         };
 
         // Descomenta el siguiente bloque para enviar los datos a tu API.
-        /*
         try {
           await createUser(userPayload);
         } catch (apiError) {
@@ -115,9 +117,9 @@ export default function AuthForm({ mode }: AuthFormProps) {
           });
           // Importante: Volver a lanzar el error o manejarlo para que el flujo no continue
           // como si todo hubiera sido exitoso.
+          await userCredential.user.delete(); // Limpia el usuario de Firebase si el backend falla
           throw apiError; 
         }
-        */
 
         toast({
           title: '¡Cuenta creada!',
@@ -140,6 +142,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
         'auth/weak-password': 'La contraseña es demasiado débil.',
         'auth/user-not-found': 'No se encontró un usuario con ese correo.',
         'auth/wrong-password': 'La contraseña es incorrecta.',
+        'auth/network-request-failed': 'Error de red. Por favor, revisa tu conexión a internet.'
       };
       const errorMessage = firebaseErrorMessages[error.code] || 'Ocurrió un error inesperado durante la autenticación.';
 
