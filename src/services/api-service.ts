@@ -1,40 +1,30 @@
 import type { Transaction, UserPayload } from '@/lib/types';
 import { transactions as fallbackTransactions } from '@/lib/data';
 import { apiConfig } from '@/lib/api-config';
+import axios, { type AxiosRequestConfig } from 'axios';
 
-async function fetchFromApi(endpoint: string, options: RequestInit = {}): Promise<any> {
-    const { baseUrl } = apiConfig;
-    
-    if (!baseUrl) {
+const axiosInstance = axios.create({
+    baseURL: apiConfig.baseUrl,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+async function apiRequest(config: AxiosRequestConfig): Promise<any> {
+    if (!apiConfig.baseUrl) {
         console.warn("La URL de la API no está configurada. Usando datos de respaldo donde sea posible.");
-        // Devuelve una promesa rechazada para que los llamadores puedan manejar el error.
         return Promise.reject(new Error("API URL no está configurada"));
     }
-    
+
     try {
-        const response = await fetch(`${baseUrl}${endpoint}`, {
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers,
-            },
-        });
-
-        if (!response.ok) {
-            const errorBody = await response.text();
-            console.error(`Error de API (${response.status}) en ${endpoint}: ${errorBody}`);
-            throw new Error(`La respuesta de la red no fue correcta: ${response.statusText}`);
-        }
-        
-        // Si la respuesta no tiene cuerpo (ej. DELETE), devuelve un objeto vacío.
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-            return await response.json();
-        }
-        return {};
-
+        const response = await axiosInstance(config);
+        return response.data;
     } catch (error) {
-        console.error('Hubo un problema con la operación de fetch:', error);
+        if (axios.isAxiosError(error)) {
+            console.error(`Error de API (${error.response?.status}) en ${config.url}:`, error.response?.data);
+        } else {
+            console.error('Hubo un problema con la petición de axios:', error);
+        }
         throw error;
     }
 }
@@ -42,7 +32,10 @@ async function fetchFromApi(endpoint: string, options: RequestInit = {}): Promis
 
 export async function getTransactions(): Promise<Transaction[]> {
     try {
-        const data = await fetchFromApi(apiConfig.endpoints.transactions.getAll);
+        const data = await apiRequest({
+            method: 'GET',
+            url: apiConfig.endpoints.transactions.getAll,
+        });
         return data as Transaction[];
     } catch (error) {
         console.log('Error al obtener transacciones de la API, usando datos de respaldo.');
@@ -52,9 +45,10 @@ export async function getTransactions(): Promise<Transaction[]> {
 
 export async function addTransaction(transaction: Omit<Transaction, 'id'>): Promise<Transaction> {
      try {
-        return await fetchFromApi(apiConfig.endpoints.transactions.create, {
+        return await apiRequest({
             method: 'POST',
-            body: JSON.stringify(transaction),
+            url: apiConfig.endpoints.transactions.create,
+            data: transaction,
         });
     } catch (error) {
         console.error("No se pudo añadir la transacción a través de la API.");
@@ -64,9 +58,10 @@ export async function addTransaction(transaction: Omit<Transaction, 'id'>): Prom
 
 export async function updateTransaction(id: string, transaction: Partial<Transaction>): Promise<Transaction> {
      try {
-        return await fetchFromApi(apiConfig.endpoints.transactions.update(id), {
+        return await apiRequest({
             method: 'PUT',
-            body: JSON.stringify(transaction),
+            url: apiConfig.endpoints.transactions.update(id),
+            data: transaction,
         });
     } catch (error) {
         console.error("No se pudo actualizar la transacción a través de la API.");
@@ -76,8 +71,9 @@ export async function updateTransaction(id: string, transaction: Partial<Transac
 
 export async function deleteTransaction(id: string): Promise<void> {
     try {
-        await fetchFromApi(apiConfig.endpoints.transactions.delete(id), {
+        await apiRequest({
             method: 'DELETE',
+            url: apiConfig.endpoints.transactions.delete(id),
         });
     } catch (error) {
         console.error("No se pudo eliminar la transacción a través de la API.");
@@ -87,13 +83,13 @@ export async function deleteTransaction(id: string): Promise<void> {
 
 export async function createUser(payload: UserPayload): Promise<any> {
     try {
-        return await fetchFromApi(apiConfig.endpoints.users.create, {
+        return await apiRequest({
             method: 'POST',
-            body: JSON.stringify(payload),
+            url: apiConfig.endpoints.users.create,
+            data: payload,
         });
     } catch (error) {
         console.error("No se pudo crear el usuario a través de la API.");
-        // En un caso real, podrías querer eliminar el usuario de Firebase Auth si este paso falla.
         throw error;
     }
 }
